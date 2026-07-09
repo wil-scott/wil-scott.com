@@ -1,0 +1,8 @@
+# raw personal data, never commit (see spec section 10)
+linkedinprofile-ws.pdf
+
+# brainstorming artifacts
+.superpowers/
+
+node_modules/
+.wrangler/
