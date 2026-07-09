@@ -57,7 +57,7 @@ export const content = {
       summary: 'the workshop the agents run in',
       detail: [
         out('a thinkstation in vancouver running the agents I build.'),
-        out('its agents are named for daedalus\' creations: talos patrols'),
+        out('its agents are named for daedalus’ creations: talos patrols'),
         out('the airwaves. more under construction.'),
         dim('status: running. live status on the site is a future phase,'),
         dim('so no numbers here until they are real.'),
