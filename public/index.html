@@ -4,8 +4,55 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wil Scott</title>
+  <meta name="description" content="Wil Scott. I build technical things and make them make sense to people. Courtrooms, contracts, firmware, now AI.">
+  <link rel="preload" href="/fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/css/site.css">
+  <script>
+    // set theme before first paint to avoid flash
+    const saved = localStorage.getItem('theme');
+    const preferred = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
+    document.documentElement.dataset.theme = saved || preferred;
+  </script>
+  <script type="module" src="/js/main.js"></script>
 </head>
 <body>
-  <p>skeleton. real window arrives in task 3.</p>
+  <div id="desktop" aria-label="desktop">
+    <button class="icon" id="icon-resume"><span class="glyph doc"></span>resume.pdf</button>
+    <button class="icon" id="icon-daedalus"><span class="glyph folder"></span>daedalus</button>
+    <button class="icon" id="icon-trash"><span class="glyph trash"></span>trash</button>
+    <p id="desktop-toast" role="status" hidden></p>
+  </div>
+
+  <main id="window" aria-label="terminal">
+    <header id="titlebar">
+      <button class="dot close" id="btn-close" aria-label="close" data-sym="&times;"></button>
+      <button class="dot min" id="btn-min" aria-label="minimize" data-sym="&minus;"></button>
+      <button class="dot max" id="btn-max" aria-label="maximize" data-sym="+"></button>
+      <span id="host">w@vancouver: ~</span>
+      <button id="btn-theme" aria-label="toggle theme">&#9789;</button>
+    </header>
+    <div id="screen">
+      <div id="output" aria-live="polite"></div>
+      <div id="prompt-line">
+        <span class="prompt-user">w@vancouver</span><span class="prompt-path">:~$</span>
+        <span id="echo"></span><span id="cursor" aria-hidden="true"></span>
+        <input id="cmd" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="type a command">
+      </div>
+    </div>
+  </main>
+
+  <button id="dock" hidden>&#9601; w@vancouver: ~</button>
+
+  <div id="closed" hidden>
+    <p class="line-dim">connection to w@vancouver closed.</p>
+    <button id="reconnect">reconnect</button>
+  </div>
+
+  <p id="plain-link">not a terminal person? <a href="/plain/">plain version here</a></p>
+
+  <noscript>
+    <p class="noscript-note">this page needs javascript for the terminal.
+      the <a href="/plain/">plain version</a> needs nothing at all.</p>
+  </noscript>
 </body>
 </html>
