@@ -7,6 +7,7 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 export function closeWindow() {
   document.body.classList.add('closed');
   document.body.classList.remove('min', 'maxed');
+  $('dock').hidden = true;
 }
 
 function restore() {
@@ -54,17 +55,17 @@ export function typeLines(lines, print, charDelay = 25) {
     // terminal.js's renderLine builds a 'cmd' (non-href) line as
     // [span.prompt-user][span.prompt-path][text node " <text>"], so the
     // animated text there lives in a trailing text node with a leading
-    // space, not the whole element. every other style is a single node
-    // (a plain text node from `div.textContent = ...`, or the <a> from an
-    // href line) so typing into el.lastChild is safe there too. printing
-    // the empty partial first (as renderLine would) guarantees that node
-    // already exists before we start mutating it.
+    // space, not the whole element. href lines hold their text in a
+    // single <a> child. plain lines use `div.textContent = ...`, which
+    // for our empty partial inserts NO child node at all, so lastChild
+    // is null there; type into the line div itself in that case (safe:
+    // no sibling spans to destroy, and the end state equals print()'s).
     const isCmdEcho = line.style === 'cmd' && !line.href;
     const prefix = isCmdEcho ? ' ' : '';
     const partial = { ...line, text: '' };
     print([partial]);
     const el = $('output').lastElementChild;
-    const target = el.lastChild;
+    const target = el.lastChild ?? el;
     const tick = setInterval(() => {
       i += 1;
       target.textContent = prefix + line.text.slice(0, i);
