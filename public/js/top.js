@@ -36,6 +36,7 @@ function frame(tick) {
 export function runTop(outputEl, onQuit) {
   const panel = document.createElement('pre');
   panel.id = 'top-panel';
+  panel.setAttribute('aria-hidden', 'true');
   outputEl.appendChild(panel);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const cmd = document.getElementById('cmd');
@@ -46,16 +47,22 @@ export function runTop(outputEl, onQuit) {
   draw();
   const timer = reduced ? null : setInterval(draw, 1000);
 
-  const onKey = (e) => {
+  function quit() {
+    if (timer) clearInterval(timer);
+    document.removeEventListener('keydown', onKey, true);
+    panel.removeEventListener('click', quit);
+    panel.remove();
+    onQuit();
+  }
+
+  function onKey(e) {
     if (e.key === 'q' || e.key === 'Escape') {
-      if (timer) clearInterval(timer);
-      document.removeEventListener('keydown', onKey, true);
-      panel.remove();
-      cmd.focus();
-      onQuit();
       e.preventDefault();
       e.stopPropagation();
+      quit();
     }
-  };
+  }
+
   document.addEventListener('keydown', onKey, true);
+  panel.addEventListener('click', quit);
 }
