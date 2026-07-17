@@ -14,6 +14,10 @@ const AGENTS = [
 const SPARK = '▁▂▃▄▅▆▇█';
 const HIST_WIDE = 30;
 const HIST_NARROW = 16;
+const NET_HIST = 12;
+const CORE_BASES = [72, 48, 61, 33];
+const PANEL_W = 56; // full bordered width, incl. corner chars
+const INNER_W = PANEL_W - 4; // minus '| ' and ' |'
 
 const jitter = (n) => Math.max(0, Math.min(99, n + Math.round((Math.random() - 0.5) * 14)));
 const jitterFloat = (n) => Math.max(0, n + (Math.random() - 0.5) * 0.4);
@@ -23,9 +27,19 @@ function walk(current) {
   return Math.max(15, Math.min(95, current + step));
 }
 
+const span = (cls, text) => `<span class="${cls}">${text}</span>`;
+const dim = (text) => span('top-dim', text);
+
+// btop-style value buckets: teal below 40, amber to 75, red above.
+function levelClass(pct) {
+  if (pct > 75) return 'top-high';
+  if (pct >= 40) return 'top-mid';
+  return 'top-low';
+}
+
 function bar(pct, width) {
   const fill = Math.round((pct / 100) * width);
-  return `<span class="bar-fill">${'█'.repeat(fill)}</span><span class="bar-empty">${'░'.repeat(width - fill)}</span>`;
+  return `${span(levelClass(pct), '█'.repeat(fill))}<span class="bar-empty">${'░'.repeat(width - fill)}</span>`;
 }
 
 function sparkChar(pct) {
@@ -44,8 +58,45 @@ function pushHistory(hist, val, len) {
   while (hist.length > len) hist.shift();
 }
 
+// Each glyph colored by its own value bucket; adjacent same-bucket
+// glyphs share one span to keep the node count down.
 function sparkline(hist) {
-  return `<span class="bar-fill">${hist.map(sparkChar).join('')}</span>`;
+  let html = '';
+  let cls = null;
+  let buf = '';
+  for (const v of hist) {
+    const c = levelClass(v);
+    if (c !== cls && buf) {
+      html += span(cls, buf);
+      buf = '';
+    }
+    cls = c;
+    buf += sparkChar(v);
+  }
+  if (buf) html += span(cls, buf);
+  return html;
+}
+
+function pct3(n) {
+  return `${String(n).padStart(3)}%`;
+}
+
+/* ---- bordered panel helpers (desktop) ---- */
+
+function panelTop(title, sub) {
+  const subVis = sub ? 3 + sub.length : 0;
+  const dashes = PANEL_W - 5 - title.length - subVis;
+  let html = dim('┌─ ') + title;
+  if (sub) html += dim(` ─ ${sub}`);
+  return `${html} ${dim(`${'─'.repeat(dashes)}┐`)}`;
+}
+
+function panelBottom() {
+  return dim(`└${'─'.repeat(PANEL_W - 2)}┘`);
+}
+
+function panelRow(html, visibleLen) {
+  return dim('│ ') + html + ' '.repeat(Math.max(0, INNER_W - visibleLen)) + dim(' │');
 }
 
 function sortedProcs(cpuByPid) {
@@ -63,7 +114,7 @@ function loadAvgLine(base) {
 }
 
 function frame(state, narrow) {
-  const barWidth = narrow ? 12 : 30;
+  const barWidth = 12;
   const histLen = narrow ? HIST_NARROW : HIST_WIDE;
 
   const cpu = walk(state.lastCpu);
@@ -72,6 +123,13 @@ function frame(state, narrow) {
   state.lastMem = mem;
   pushHistory(state.cpuHistory, cpu, histLen);
   pushHistory(state.memHistory, mem, histLen);
+  state.cores = state.cores.map(walk);
+  state.netUp = walk(state.netUp);
+  state.netDown = walk(state.netDown);
+  pushHistory(state.upHistory, state.netUp, NET_HIST);
+  pushHistory(state.downHistory, state.netDown, NET_HIST);
+  const upKbs = (state.netUp * 0.42).toFixed(1);
+  const downKbs = (state.netDown * 1.9).toFixed(1);
 
   const cpuByPid = new Map(PROCS.map((p) => [p.pid, p.state === 'zombie' ? 0 : jitter(p.base)]));
   const procs = sortedProcs(cpuByPid);
@@ -81,12 +139,16 @@ function frame(state, narrow) {
     const state2 = p.state || 'running';
     const dot = state2 === 'running' ? '<span class="top-dot">●</span>' : ' ';
     if (narrow) {
-      return `${dot} ${String(p.pid).padStart(4)} ${p.name.padEnd(16)} ${String(c).padStart(3)}% ${state2.padEnd(8)}`.trimEnd();
+      if (state2 === 'zombie') {
+        return `  ${dim(`${String(p.pid).padStart(4)} ${p.name.padEnd(16)} ${pct3(c)} zombie`)}`;
+      }
+      return `${dot} ${String(p.pid).padStart(4)} ${p.name.padEnd(16)} ${span(levelClass(c), pct3(c))} ${state2.padEnd(8)}`.trimEnd();
     }
-    return `${dot} ${String(p.pid).padStart(5)}  ${p.name.padEnd(20)} ${String(c).padStart(3)}%  ${state2.padEnd(9)} ${p.time}`;
+    if (state2 === 'zombie') {
+      return `  ${dim(`${String(p.pid).padStart(5)}  ${p.name.padEnd(20)} ${pct3(c)}  ${'zombie'.padEnd(9)} ${p.time}`)}`;
+    }
+    return `${dot} ${String(p.pid).padStart(5)}  ${p.name.padEnd(20)} ${span(levelClass(c), pct3(c))}  ${state2.padEnd(9)} ${p.time}`;
   }).join('\n');
-
-  const agentLines = AGENTS.map((a) => `  <span class="top-dot">●</span> ${a.name.padEnd(narrow ? 12 : 16)} ${a.status}`).join('\n');
 
   const header = narrow
     ? 'w@vancouver   uptime: 3 careers'
@@ -94,14 +156,16 @@ function frame(state, narrow) {
   const footer = 'q or tap to quit';
 
   if (narrow) {
+    const agentLines = AGENTS.map((a) => `  <span class="top-dot">●</span> ${a.name.padEnd(12)} ${a.status}`).join('\n');
     const procHeader = `  ${'pid'.padStart(4)} ${'name'.padEnd(16)} ${'cpu'.padStart(3)}% ${'state'.padEnd(8)}`.trimEnd();
     return [
       header,
       '',
-      `cpu  [${bar(cpu, barWidth)}] ${String(cpu).padStart(3)}%`,
+      `cpu  [${bar(cpu, barWidth)}] ${span(levelClass(cpu), pct3(cpu))}`,
       `     ${sparkline(state.cpuHistory)}`,
-      `mem  [${bar(mem, barWidth)}] ${String(mem).padStart(3)}%`,
+      `mem  [${bar(mem, barWidth)}] ${span(levelClass(mem), pct3(mem))}`,
       `     ${sparkline(state.memHistory)}`,
+      `net  up ${upKbs}  down ${downKbs} kb/s`,
       '',
       'agents',
       agentLines,
@@ -113,14 +177,43 @@ function frame(state, narrow) {
     ].join('\n');
   }
 
+  const coreRows = state.cores.map((v, i) => panelRow(
+    `core${i} [${bar(v, barWidth)}] ${span(levelClass(v), pct3(v))}`,
+    5 + 2 + barWidth + 2 + 4,
+  ));
+
+  const memRow = panelRow(
+    `[${bar(mem, barWidth)}] ${span(levelClass(mem), pct3(mem))}  ${sparkline(state.memHistory)}`,
+    1 + barWidth + 2 + 4 + 2 + state.memHistory.length,
+  );
+
+  const netRow = (label, kbs, hist) => panelRow(
+    `${label.padEnd(4)} ${kbs.padStart(5)} kb/s  ${sparkline(hist)}`,
+    4 + 1 + 5 + 5 + 2 + hist.length,
+  );
+
+  const agentRows = AGENTS.map((a) => panelRow(
+    `<span class="top-dot">●</span> ${a.name.padEnd(16)} ${a.status}`,
+    1 + 1 + 16 + 1 + a.status.length,
+  ));
+
   return [
     header,
     '',
-    `cpu  [${bar(cpu, barWidth)}] ${String(cpu).padStart(3)}%   ${sparkline(state.cpuHistory)}`,
-    `mem  [${bar(mem, barWidth)}] ${String(mem).padStart(3)}%   ${sparkline(state.memHistory)}`,
-    '',
-    'agents',
-    agentLines,
+    panelTop('cpu'),
+    ...coreRows,
+    panelRow(sparkline(state.cpuHistory), state.cpuHistory.length),
+    panelBottom(),
+    panelTop('mem'),
+    memRow,
+    panelBottom(),
+    panelTop('net', 'agents chattering'),
+    netRow('up', upKbs, state.upHistory),
+    netRow('down', downKbs, state.downHistory),
+    panelBottom(),
+    panelTop('agents'),
+    ...agentRows,
+    panelBottom(),
     '',
     '    pid  name                 cpu   state     time',
     rows,
@@ -148,6 +241,11 @@ export function runTop(outputEl, onQuit) {
     lastCpu: cpuHist[cpuHist.length - 1],
     lastMem: memHist[memHist.length - 1],
     loadBase: [0.92, 0.78, 0.63],
+    cores: [...CORE_BASES],
+    netUp: 30,
+    netDown: 62,
+    upHistory: seedHistory(NET_HIST, 30),
+    downHistory: seedHistory(NET_HIST, 62),
   };
 
   // innerHTML is safe here: all rendered content is static or generated
@@ -159,7 +257,7 @@ export function runTop(outputEl, onQuit) {
   function quit() {
     if (timer) clearInterval(timer);
     document.removeEventListener('keydown', onKey, true);
-    document.removeEventListener('click', quit, true);
+    document.removeEventListener('click', onClick, true);
     panel.remove();
     onQuit();
   }
@@ -172,11 +270,13 @@ export function runTop(outputEl, onQuit) {
     }
   }
 
-  document.addEventListener('keydown', onKey, true);
-  document.addEventListener('click', (e) => {
+  function onClick(e) {
     if (!e.target.closest('#screen')) return;
     e.stopPropagation();
     e.preventDefault();
     quit();
-  }, true);
+  }
+
+  document.addEventListener('keydown', onKey, true);
+  document.addEventListener('click', onClick, true);
 }
