@@ -37,6 +37,17 @@ function levelClass(pct) {
   return 'top-low';
 }
 
+// Same buckets as levelClass, but for numeric/text labels rather than
+// bar/sparkline glyphs: these get their own classes so day theme can
+// darken them for contrast without touching the fixed glyph palette.
+function levelTextClass(pct) {
+  return `${levelClass(pct)}-t`;
+}
+
+function pctSpan(pct) {
+  return span(levelTextClass(pct), pct3(pct));
+}
+
 function bar(pct, width) {
   const fill = Math.round((pct / 100) * width);
   return `${span(levelClass(pct), '█'.repeat(fill))}<span class="bar-empty">${'░'.repeat(width - fill)}</span>`;
@@ -142,12 +153,12 @@ function frame(state, narrow) {
       if (state2 === 'zombie') {
         return `  ${dim(`${String(p.pid).padStart(4)} ${p.name.padEnd(16)} ${pct3(c)} zombie`)}`;
       }
-      return `${dot} ${String(p.pid).padStart(4)} ${p.name.padEnd(16)} ${span(levelClass(c), pct3(c))} ${state2.padEnd(8)}`.trimEnd();
+      return `${dot} ${String(p.pid).padStart(4)} ${p.name.padEnd(16)} ${pctSpan(c)} ${state2.padEnd(8)}`.trimEnd();
     }
     if (state2 === 'zombie') {
       return `  ${dim(`${String(p.pid).padStart(5)}  ${p.name.padEnd(20)} ${pct3(c)}  ${'zombie'.padEnd(9)} ${p.time}`)}`;
     }
-    return `${dot} ${String(p.pid).padStart(5)}  ${p.name.padEnd(20)} ${span(levelClass(c), pct3(c))}  ${state2.padEnd(9)} ${p.time}`;
+    return `${dot} ${String(p.pid).padStart(5)}  ${p.name.padEnd(20)} ${pctSpan(c)}  ${state2.padEnd(9)} ${p.time}`;
   }).join('\n');
 
   const header = narrow
@@ -161,9 +172,9 @@ function frame(state, narrow) {
     return [
       header,
       '',
-      `cpu  [${bar(cpu, barWidth)}] ${span(levelClass(cpu), pct3(cpu))}`,
+      `cpu  [${bar(cpu, barWidth)}] ${pctSpan(cpu)}`,
       `     ${sparkline(state.cpuHistory)}`,
-      `mem  [${bar(mem, barWidth)}] ${span(levelClass(mem), pct3(mem))}`,
+      `mem  [${bar(mem, barWidth)}] ${pctSpan(mem)}`,
       `     ${sparkline(state.memHistory)}`,
       `net  up ${upKbs}  down ${downKbs} kb/s`,
       '',
@@ -178,12 +189,12 @@ function frame(state, narrow) {
   }
 
   const coreRows = state.cores.map((v, i) => panelRow(
-    `core${i} [${bar(v, barWidth)}] ${span(levelClass(v), pct3(v))}`,
+    `core${i} [${bar(v, barWidth)}] ${pctSpan(v)}`,
     5 + 2 + barWidth + 2 + 4,
   ));
 
   const memRow = panelRow(
-    `[${bar(mem, barWidth)}] ${span(levelClass(mem), pct3(mem))}  ${sparkline(state.memHistory)}`,
+    `[${bar(mem, barWidth)}] ${pctSpan(mem)}  ${sparkline(state.memHistory)}`,
     1 + barWidth + 2 + 4 + 2 + state.memHistory.length,
   );
 
