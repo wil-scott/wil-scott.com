@@ -41,7 +41,7 @@ function initTheme() {
   apply(document.documentElement.dataset.theme);
   btn.addEventListener('click', () => {
     const next = document.documentElement.dataset.theme === 'night' ? 'day' : 'night';
-    localStorage.setItem('theme', next);
+    try { localStorage.setItem('theme', next); } catch { /* storage blocked */ }
     apply(next);
   });
 }
@@ -74,7 +74,7 @@ export function typeLines(lines, print, charDelay = 25) {
   })), Promise.resolve());
 }
 
-export function initUI(term) {
+export function initUI() {
   initTheme();
 
   $('btn-close').addEventListener('click', closeWindow);

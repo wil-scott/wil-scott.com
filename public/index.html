@@ -9,7 +9,8 @@
   <link rel="stylesheet" href="/css/site.css">
   <script>
     // set theme before first paint to avoid flash
-    const saved = localStorage.getItem('theme');
+    let saved = null;
+    try { saved = localStorage.getItem('theme'); } catch { /* storage blocked */ }
     const preferred = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
     document.documentElement.dataset.theme = saved || preferred;
   </script>

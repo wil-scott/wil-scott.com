@@ -192,11 +192,13 @@ export function initTerminal() {
   });
 
   async function boot() {
-    if (sessionStorage.getItem('introPlayed')) {
+    let introPlayed = null;
+    try { introPlayed = sessionStorage.getItem('introPlayed'); } catch { /* storage blocked */ }
+    if (introPlayed) {
       cmd.focus();
       return;
     }
-    sessionStorage.setItem('introPlayed', '1');
+    try { sessionStorage.setItem('introPlayed', '1'); } catch { /* storage blocked */ }
 
     const { lines } = route('whoami');
     const introLines = [{ text: 'whoami', style: 'cmd' }, ...lines, HELP_HINT];

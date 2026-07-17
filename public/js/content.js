@@ -2,14 +2,15 @@
 // every string in this file is draft copy until the copy workshop (task 9).
 // verify before launch: employment dates and linkedin url against the real
 // linkedin profile; email choice (gmail vs hello@ alias) is a task 9 decision.
+// window-chrome strings (prompt, closed message, reconnect, plain-link,
+// icon labels) live in index.html and plain/index.html, so the copy pass
+// must cover those files too.
 
 const fg = (text) => ({ text, style: 'fg' });
 const out = (text) => ({ text, style: 'out' });
 const dim = (text) => ({ text, style: 'dim' });
 
 export const content = {
-  host: 'w@vancouver',
-
   whoami: [
     fg('Wil Scott'),
     out('I build technical things and make them make sense to people.'),
@@ -135,27 +136,20 @@ export const content = {
     pwd: [out('/home/w')],
     unknown: [dim('not a command yet. freeform questions are coming; try help.')],
     catMissing: (name) => [{ text: `cat: ${name}: no such file`, style: 'error' }],
+    catNoArg: [{ text: 'cat: missing operand. try ls.', style: 'error' }],
   },
 
   desktop: {
     resume: {
-      label: 'resume.pdf',
       // until the sanitized pdf exists at public/resume.pdf, ui.js shows
       // fallbackLine instead of downloading. honest degradation.
       fallbackLine: 'resume.pdf is being updated. email me and I will send it.',
     },
     daedalus: {
-      label: 'daedalus',
       line: 'home server. runs the agents. live status is a future phase.',
     },
     trash: {
-      label: 'trash',
       line: 'hugo_site_v1. it pretended to be a terminal. we do not talk about it.',
     },
   },
-
-  closedMessage: 'connection to w@vancouver closed.',
-  reconnectLabel: 'reconnect',
-  plainHint: 'not a terminal person?',
-  plainLinkText: 'plain version here',
 };

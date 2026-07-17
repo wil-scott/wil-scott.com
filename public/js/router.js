@@ -1,9 +1,6 @@
 import { content } from './content.js';
 
-// ============================================================
-// zone 1: command tables (complete — no work needed here)
-// every handler returns { lines, effect }
-// ============================================================
+// command tables. every handler returns { lines, effect }
 
 const commands = {
   help: () => ({ lines: content.help, effect: null }),
@@ -18,16 +15,16 @@ const commands = {
   clear: () => ({ lines: [], effect: 'clear' }),
   exit: () => ({ lines: [], effect: 'exit' }),
   top: () => ({ lines: [], effect: 'top' }),
-  // argument-taking commands delegate to your functions in zone 3
+  // argument-taking commands delegate to their handlers below
   projects: (args) => projectsCmd(args),
   cat: (args) => catCmd(args),
 };
 
-// two-token commands. route() must check these BEFORE the single-token
-// table, by joining the lowercased command with the SECOND token:
+// two-token commands. route() checks these before the single-token table,
+// by joining the lowercased command with the SECOND token:
 //   `${cmd} ${rest[0]}`
-// careful: '$PATH' is case-sensitive. you lowercase only the FIRST
-// token, so building the key from cmd + the raw second token is correct.
+// '$PATH' is case-sensitive: only the first token is lowercased, so
+// building the key from cmd + the raw second token is correct.
 const twoWordCommands = {
   'sudo hire-me': () => ({ lines: content.jokes.sudoHireMe, effect: null }),
   'ssh daedalus': () => ({ lines: content.jokes.sshDaedalus, effect: null }),
@@ -58,12 +55,10 @@ export function route(input) {
   return { lines: content.jokes.unknown, effect: null };
 }
 
-// ============================================================
-// zone 3: argument-taking handlers (yours)
-// ============================================================
+// argument-taking handlers
 
 function projectsCmd(args) {
-  const name = args[0];
+  const name = args[0]?.toLowerCase();
 
   if (!name) {
     const lines = [];
@@ -80,15 +75,15 @@ function projectsCmd(args) {
 }
 
 function catCmd(args) {
+  // cat stays case-sensitive, unlike projects.
   const name = args[0];
-  const file = name && content.files[name];
+  if (!name) return { lines: content.jokes.catNoArg, effect: null };
+  const file = content.files[name];
   if (file) return { lines: file, effect: null };
-  return { lines: content.jokes.catMissing(name ?? ''), effect: null };
+  return { lines: content.jokes.catMissing(name), effect: null };
 }
 
-// ============================================================
-// zone 4: tab completion (yours — last piece)
-// ============================================================
+// tab completion
 
 export function complete(input) {
   if (!input.includes(' ')) {
