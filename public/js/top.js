@@ -88,6 +88,7 @@ export function runTop(outputEl, onQuit) {
 
   document.addEventListener('keydown', onKey, true);
   document.addEventListener('click', (e) => {
+    if (!e.target.closest('#screen')) return;
     e.stopPropagation();
     e.preventDefault();
     quit();
