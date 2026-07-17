@@ -192,20 +192,21 @@ export function initTerminal() {
   });
 
   async function boot() {
+    // sessionStorage gates ONLY whether the typing animation plays; the
+    // whoami content itself must always print, on every load (fresh visit,
+    // reload, back/forward nav, resumed mobile tab). Never early-return
+    // before print() runs, or #output stays empty forever on repeat loads.
     let introPlayed = null;
     try { introPlayed = sessionStorage.getItem('introPlayed'); } catch { /* storage blocked */ }
-    if (introPlayed) {
-      cmd.focus();
-      return;
-    }
     try { sessionStorage.setItem('introPlayed', '1'); } catch { /* storage blocked */ }
 
     const { lines } = route('whoami');
     const introLines = [{ text: 'whoami', style: 'cmd' }, ...lines, HELP_HINT];
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const shouldAnimate = !introPlayed && !reducedMotion;
     let animated = false;
 
-    if (!reducedMotion) {
+    if (shouldAnimate) {
       try {
         const ui = await import('./ui.js');
         await ui.typeLines(introLines, print);
