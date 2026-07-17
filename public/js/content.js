@@ -93,7 +93,7 @@ export const content = {
     out('  2017  Called to bar'),
     out('  2019  Counsel at Murphy and Co'),
     out('  2021  git init career-pivot'),
-    out('  2022  Embedded internship, Sierra Wireless'),
+    out('  2022  Embedded intern, Sierra Wireless'),
     out('  2023  BCIT CST diploma'),
     out('  2024  Software engineer, Polyga'),
     out('  2025  Tech support engineer, Pocus'),
