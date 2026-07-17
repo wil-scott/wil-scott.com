@@ -18,6 +18,11 @@ const HIST_NARROW = 16;
 const jitter = (n) => Math.max(0, Math.min(99, n + Math.round((Math.random() - 0.5) * 14)));
 const jitterFloat = (n) => Math.max(0, n + (Math.random() - 0.5) * 0.4);
 
+function walk(current) {
+  const step = Math.round((Math.random() - 0.5) * 24); // ±12
+  return Math.max(15, Math.min(95, current + step));
+}
+
 function bar(pct, width) {
   const fill = Math.round((pct / 100) * width);
   return `<span class="bar-fill">${'█'.repeat(fill)}</span><span class="bar-empty">${'░'.repeat(width - fill)}</span>`;
@@ -61,8 +66,10 @@ function frame(state, narrow) {
   const barWidth = narrow ? 12 : 30;
   const histLen = narrow ? HIST_NARROW : HIST_WIDE;
 
-  const cpu = jitter(68);
-  const mem = jitter(41);
+  const cpu = walk(state.lastCpu);
+  const mem = walk(state.lastMem);
+  state.lastCpu = cpu;
+  state.lastMem = mem;
   pushHistory(state.cpuHistory, cpu, histLen);
   pushHistory(state.memHistory, mem, histLen);
 
@@ -81,7 +88,9 @@ function frame(state, narrow) {
 
   const agentLines = AGENTS.map((a) => `  <span class="top-dot">●</span> ${a.name.padEnd(narrow ? 12 : 16)} ${a.status}`).join('\n');
 
-  const header = `w@vancouver   load avg: ${loadAvgLine(state.loadBase)}   uptime: 3 careers`;
+  const header = narrow
+    ? 'w@vancouver   uptime: 3 careers'
+    : `w@vancouver   load avg: ${loadAvgLine(state.loadBase)}   uptime: 3 careers`;
   const footer = 'q or tap to quit';
 
   if (narrow) {
@@ -131,9 +140,13 @@ export function runTop(outputEl, onQuit) {
   cmd.blur();
 
   const histLen = narrow ? HIST_NARROW : HIST_WIDE;
+  const cpuHist = seedHistory(histLen, 68);
+  const memHist = seedHistory(histLen, 41);
   const state = {
-    cpuHistory: seedHistory(histLen, 68),
-    memHistory: seedHistory(histLen, 41),
+    cpuHistory: cpuHist,
+    memHistory: memHist,
+    lastCpu: cpuHist[cpuHist.length - 1],
+    lastMem: memHist[memHist.length - 1],
     loadBase: [0.92, 0.78, 0.63],
   };
 
