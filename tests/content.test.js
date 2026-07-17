@@ -13,7 +13,7 @@ test('no em dashes anywhere in content', () => {
 test('whoami has name and the sentence', () => {
   assert.equal(content.whoami[0].text, 'Wil Scott');
   const all = content.whoami.map(l => l.text).join(' ');
-  assert.match(all, /Courtrooms, contracts, code, now AI\./);
+  assert.match(all, /Courtrooms, contracts, code\. Chasing AI next\./);
 });
 
 test('projects have honest statuses', () => {

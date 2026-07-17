@@ -11,7 +11,7 @@ export const content = {
   whoami: [
     fg('Wil Scott'),
     out('I build technical things and make them make sense to people.'),
-    out('Courtrooms, contracts, code, now AI.'),
+    out('Courtrooms, contracts, code. Chasing AI next.'),
   ],
 
   help: [
@@ -24,7 +24,7 @@ export const content = {
     out('  colophon    How this was made'),
     out('  contact     Say hello'),
     out('  clear       Tidy up'),
-    out('  exit        Leave (not vim, you can)'),
+    out('  exit        Leave'),
     dim('Or poke around: the buttons work, ls too.'),
   ],
 
@@ -93,11 +93,11 @@ export const content = {
     out('  2017  Called to bar'),
     out('  2019  Counsel at Murphy and Co'),
     out('  2021  git init career-pivot'),
-    out('  2022  Embedded internship at Sierra Wireless'),
+    out('  2022  Embedded internship, Sierra Wireless'),
     out('  2023  BCIT CST diploma'),
-    out('  2024  Software engineer at Polyga'),
-    out('  2025  systemctl start pocus.service'),
-    out('  2025  git merge apollo.io'),
+    out('  2024  Software engineer, Polyga'),
+    out('  2025  Tech support engineer, Pocus'),
+    out('  2025  Pocus acquired by Apollo.io'),
     out('  2026  ./build-agents.sh --all-in'),
   ],
 
@@ -111,10 +111,10 @@ export const content = {
     { text: '-----------', style: 'accent' },
     out('OS: human, rebuilt from source'),
     out('Host: Vancouver, BC'),
-    out('Kernel: law 1.0 > code 2.0 > ai 3.0'),
+    out('Kernel: law 1.0 → code 2.0 → ai 3.0'),
     out('Uptime: 2 kernel upgrades, zero panics'),
     out('Shell: /bin/lawyer (in background)'),
-    out('Packages: C++, Python, TS, claude-sdk'),
+    out('Packages: C++, Python, ESP-IDF, claude-sdk'),
     dim('Theme: amber on void'),
   ],
 
@@ -135,7 +135,7 @@ export const content = {
     vim: [out('The one terminal where you cannot get stuck in vim. :q')],
     echoPath: [out('/courtrooms:/contracts:/code:/ai')],
     pwd: [out('/home/w')],
-    unknown: [dim('command not found. Freeform questions are coming; try help.')],
+    unknown: [dim('command not found. Try help.')],
     catMissing: (name) => [{ text: `cat: ${name}: no such file`, style: 'error' }],
     catNoArg: [{ text: "cat: missing operand. Try 'ls'.", style: 'error' }],
   },
