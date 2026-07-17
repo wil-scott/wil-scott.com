@@ -136,7 +136,7 @@ body.closed #closed { display: flex; }
 .noscript-note { color: var(--out); margin-top: 16px; }
 
 /* ---- top program ---- */
-#top-panel { white-space: pre; }
+#top-panel { white-space: pre; color: var(--out); }
 #top-panel .bar-fill { color: var(--accent); }
 #top-panel .bar-empty { color: var(--dim); }
 

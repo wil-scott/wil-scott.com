@@ -87,5 +87,9 @@ export function runTop(outputEl, onQuit) {
   }
 
   document.addEventListener('keydown', onKey, true);
-  document.addEventListener('click', quit, true);
+  document.addEventListener('click', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    quit();
+  }, true);
 }
