@@ -74,7 +74,7 @@ export const content = {
   files: {
     '.plan': [
       dim('Current plan (updated 2026-07):'),
-      out('1. Ship this site'),
+      out('1. Ship this site ✓'),
       out('2. Ship talos'),
       out('3. More agents for daedalus'),
       out('4. Keep making technical things make sense to people'),
