@@ -1,6 +1,7 @@
 // tests/content.test.js
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { content } from '../public/js/content.js';
 
 test('no em dashes anywhere in content', () => {
@@ -44,4 +45,12 @@ test('contact has the three links', () => {
   assert.ok(hrefs.some(h => h.startsWith('mailto:')));
   assert.ok(hrefs.some(h => h.includes('github.com')));
   assert.ok(hrefs.some(h => h.includes('linkedin.com')));
+});
+
+test('no em dashes in html pages either', async () => {
+  for (const f of ['public/index.html', 'public/plain/index.html']) {
+    const html = await readFile(f, 'utf8');
+    assert.ok(!html.includes('—'), `em dash in ${f}`);
+    assert.ok(!html.includes('–'), `en dash in ${f}`);
+  }
 });
