@@ -79,6 +79,7 @@ body.min #window, body.closed #window { display: none; }
 .line-accent { color: var(--accent); }
 .line-error { color: #E24B4A; }
 .line-cmd { color: var(--fg); font-weight: 700; }
+#output > div { white-space: pre-wrap; }
 #output a, #screen a, #plain-link a, #closed a { color: var(--accent); text-decoration: none; }
 #output a:hover, #output a:focus-visible { text-decoration: underline; }
 #output pre { font: inherit; white-space: pre; }
