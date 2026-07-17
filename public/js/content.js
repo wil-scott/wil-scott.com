@@ -24,8 +24,8 @@ export const content = {
     out('  resume      the serious version'),
     out('  contact     say hello'),
     out('  clear       tidy up'),
-    out('  exit        leave (this is not vim, you can)'),
-    dim('or poke around. the window buttons work. so does ls.'),
+    out('  exit        leave (not vim, you can)'),
+    dim('or poke around: buttons work, ls too.'),
   ],
 
   projects: {
@@ -113,15 +113,20 @@ export const content = {
   ],
 
   neofetch: [
-    { text: '  ██     ██  ███████    w@vancouver', style: 'accent' },
-    { text: '  ██     ██  ██         -----------', style: 'accent' },
-    out('  ██  █  ██  ███████    os: human, canadian edition'),
-    out('  ██ ███ ██       ██    host: meatspace, vancouver bc'),
-    out('   ███ ███   ███████    kernel: law 1.0 > firmware 2.0 > ai 3.0'),
-    out('                        uptime: three careers, zero reboots I admit to'),
-    out('                        shell: /bin/lawyer (deprecated)'),
-    out('                        packages: c++, python, typescript, claude-sdk'),
-    dim('                        theme: amber on void'),
+    { text: '  ██     ██  ███████', style: 'accent' },
+    { text: '  ██     ██  ██', style: 'accent' },
+    { text: '  ██  █  ██  ███████', style: 'accent' },
+    { text: '  ██ ███ ██       ██', style: 'accent' },
+    { text: '   ███ ███   ███████', style: 'accent' },
+    { text: 'w@vancouver', style: 'accent' },
+    { text: '-----------', style: 'accent' },
+    out('os: human, canadian edition'),
+    out('host: meatspace, vancouver bc'),
+    out('kernel: law 1.0 > firmware 2.0 > ai 3.0'),
+    out('uptime: three careers, zero reboots'),
+    out('shell: /bin/lawyer (deprecated)'),
+    out('packages: c++, python, ts, claude-sdk'),
+    dim('theme: amber on void'),
   ],
 
   jokes: {
