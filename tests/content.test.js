@@ -46,7 +46,7 @@ test('contact has exactly the two links', () => {
 });
 
 test('no em dashes in html pages either', async () => {
-  for (const f of ['public/index.html', 'public/plain/index.html']) {
+  for (const f of ['public/index.html', 'public/plain/index.html', 'public/404.html']) {
     const html = await readFile(f, 'utf8');
     assert.ok(!html.includes('—'), `em dash in ${f}`);
     assert.ok(!html.includes('–'), `en dash in ${f}`);

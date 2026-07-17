@@ -72,12 +72,12 @@ export const content = {
 
   files: {
     '.plan': [
-      dim('current plan (updated 2026-07):'),
-      out('1. ship this site'),
-      out('2. ship talos'),
-      out('3. build agents until someone pays me to do it full time'),
-      out('4. forward deployed engineer'),
-      out('there is no step 5.'),
+      dim('Current plan (updated 2026-07):'),
+      out('1. Ship this site'),
+      out('2. Ship talos'),
+      out('3. More agents for daedalus'),
+      out('4. Keep making technical things make sense to people'),
+      out('There is no step 5.'),
     ],
     'projects/': [dim('It is a directory. Try: projects')],
   },
@@ -137,7 +137,7 @@ export const content = {
       line: 'Home server. Runs the agents. Live status is a future phase.',
     },
     trash: {
-      line: 'hugo_site_v1 and resume_v7_final_FINAL.pdf. we do not talk about either.',
+      line: 'hugo_site_v1 and resume_v7_final_FINAL.pdf. Deleted, not forgotten.',
     },
   },
 };
