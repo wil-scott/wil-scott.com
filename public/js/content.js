@@ -97,6 +97,8 @@ export const content = {
 
   lsListing: [out('projects/   resume.pdf   .plan')],
 
+  projectsHint: [dim('try: projects <name>')],
+
   history: [
     out('  2010  enroll law-school'),
     out('  2014  pass bar-exam'),

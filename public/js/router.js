@@ -70,7 +70,7 @@ function projectsCmd(args) {
     for (const p of Object.values(content.projects)) {
       lines.push({ text: `  ${p.title.padEnd(30)} ${p.status}`, style: 'out' });
     }
-    lines.push({ text: 'try: projects <name>', style: 'dim' });
+    lines.push(...content.projectsHint);
     return { lines, effect: null };
   }
 
@@ -95,7 +95,7 @@ export function complete(input) {
     return Object.keys(commands).filter((name) => name.startsWith(input));
   }
 
-  const [word, partial] = input.split(' ');
+  const [word, partial] = input.split(/\s+/);
   let candidates = [];
   if (word === 'cat') candidates = Object.keys(content.files);
   else if (word === 'projects') candidates = Object.keys(content.projects);
