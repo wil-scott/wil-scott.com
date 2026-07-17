@@ -55,8 +55,8 @@ body {
 body.maxed { padding: 0; }
 body.maxed #window { max-width: none; max-height: none; height: 100vh; border: none; border-radius: 0; box-shadow: none; }
 body.maxed #titlebar { background: transparent; border-bottom: none; }
-body.maxed #plain-link { position: fixed; bottom: 8px; }
 body.min #window, body.closed #window { display: none; }
+body.maxed #plain-link, body.min #plain-link, body.closed #plain-link { display: none; }
 
 #titlebar { background: var(--bar); border-bottom: 1px solid var(--border); padding: 8px 14px; display: flex; align-items: center; }
 .dot { width: 12px; height: 12px; border-radius: 50%; border: none; margin-right: 8px; cursor: pointer; position: relative; padding: 0; }
