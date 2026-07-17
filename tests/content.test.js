@@ -13,7 +13,7 @@ test('no em dashes anywhere in content', () => {
 test('whoami has name and the sentence', () => {
   assert.equal(content.whoami[0].text, 'Wil Scott');
   const all = content.whoami.map(l => l.text).join(' ');
-  assert.match(all, /Courtrooms, contracts, firmware, now AI\./);
+  assert.match(all, /Courtrooms, contracts, code, now AI\./);
 });
 
 test('projects have honest statuses', () => {
@@ -29,21 +29,19 @@ test('projects have honest statuses', () => {
 
 test('help mentions every core command', () => {
   const helpText = content.help.map(l => l.text).join(' ');
-  for (const cmd of ['whoami', 'projects', 'resume', 'contact', 'clear', 'exit']) {
+  for (const cmd of ['whoami', 'projects', 'history', 'neofetch', 'top', 'contact', 'clear', 'exit']) {
     assert.ok(helpText.includes(cmd), `help missing ${cmd}`);
   }
 });
 
 test('files include the .plan deep cut', () => {
   assert.ok(content.files['.plan'].length >= 3);
-  assert.ok(content.files['resume.pdf']);
 });
 
-test('contact has the three links', () => {
+test('contact has exactly the two links', () => {
   const hrefs = content.contact.filter(l => l.href).map(l => l.href);
-  assert.equal(hrefs.length, 3);
-  assert.ok(hrefs.some(h => h.startsWith('mailto:')));
-  assert.ok(hrefs.some(h => h.includes('github.com')));
+  assert.equal(hrefs.length, 2);
+  assert.ok(hrefs.includes('mailto:hello@wil-scott.com'));
   assert.ok(hrefs.some(h => h.includes('linkedin.com')));
 });
 
