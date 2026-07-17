@@ -63,12 +63,26 @@ body.maxed #plain-link, body.min #plain-link, body.closed #plain-link { display:
 .dot.close { background: #FF5F57; }
 .dot.min { background: #FEBC2E; }
 .dot.max { background: #28C840; }
+/* Enlarge the tap/click target to >=24x24 via an absolutely positioned
+   ::before that overflows the 12px visible circle; out-of-flow, so it
+   doesn't shift the titlebar layout. ::after stays free for the hover glyph. */
+.dot::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
 .dot:hover::after, .dot:focus-visible::after {
   content: attr(data-sym); position: absolute; inset: 0;
   font-size: 9px; line-height: 12px; text-align: center; color: rgba(0, 0, 0, 0.55);
 }
 #host { margin-left: auto; color: var(--dim); font-size: 11px; }
-#btn-theme { background: none; border: none; cursor: pointer; color: var(--dim); font-size: 14px; margin-left: 10px; line-height: 1; }
+/* Padding enlarges the hit area to >=24px; matching negative margins cancel
+   the padding's contribution to flex flow so the titlebar height/spacing
+   and the glyph's visual position stay unchanged. */
+#btn-theme {
+  background: none; border: none; cursor: pointer; color: var(--dim); font-size: 14px; line-height: 1;
+  padding: 6px; margin: -6px -6px -6px 4px;
+}
 
 #screen { padding: 14px 20px 18px; overflow-y: auto; flex: 1; cursor: text; }
 
@@ -79,7 +93,7 @@ body.maxed #plain-link, body.min #plain-link, body.closed #plain-link { display:
 .line-accent { color: var(--accent); }
 .line-error { color: #E24B4A; }
 .line-cmd { color: var(--fg); font-weight: 700; }
-#output > div { white-space: pre-wrap; }
+#output > div { white-space: pre-wrap; overflow-wrap: anywhere; }
 #output a, #screen a, #plain-link a, #closed a { color: var(--accent); text-decoration: none; }
 #output a:hover, #output a:focus-visible { text-decoration: underline; }
 #output pre { font: inherit; white-space: pre; }
