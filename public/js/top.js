@@ -14,26 +14,49 @@ function bar(pct, width = 30) {
   return `<span class="bar-fill">${'█'.repeat(fill)}</span><span class="bar-empty">${'░'.repeat(width - fill)}</span>`;
 }
 
-function frame(tick) {
+function frame(tick, narrow) {
   const cpu = jitter(68);
   const mem = jitter(41);
+  const barWidth = narrow ? 12 : 30;
   const rows = PROCS.map((p) => {
     const c = p.state === 'zombie' ? 0 : jitter(p.base);
     const state = p.state || 'running';
+    if (narrow) {
+      return `${String(p.pid).padStart(4)} ${p.name.padEnd(16)} ${String(c).padStart(3)}% ${state.padEnd(8)}`.trimEnd();
+    }
     return `${String(p.pid).padStart(5)}  ${p.name.padEnd(20)} ${String(c).padStart(3)}%  ${state.padEnd(9)} ${p.time}`;
   }).join('\n');
+
+  const footer = `q or tap to quit${tick % 2 ? '' : ' '}`;
+
+  if (narrow) {
+    const header = `${'pid'.padStart(4)} ${'name'.padEnd(16)} ${'cpu'.padStart(3)}% ${'state'.padEnd(8)}`.trimEnd();
+    return [
+      `cpu  [${bar(cpu, barWidth)}] ${String(cpu).padStart(3)}%`,
+      'uptime: 3 careers',
+      `mem  [${bar(mem, barWidth)}] ${String(mem).padStart(3)}%`,
+      'load: rising steadily',
+      '',
+      header,
+      rows,
+      '',
+      footer,
+    ].join('\n');
+  }
+
   return [
-    `cpu  [${bar(cpu)}] ${String(cpu).padStart(3)}%   uptime: 3 careers`,
-    `mem  [${bar(mem)}] ${String(mem).padStart(3)}%   load: rising steadily`,
+    `cpu  [${bar(cpu, barWidth)}] ${String(cpu).padStart(3)}%   uptime: 3 careers`,
+    `mem  [${bar(mem, barWidth)}] ${String(mem).padStart(3)}%   load: rising steadily`,
     '',
     '  pid  name                 cpu   state     time',
     rows,
     '',
-    `press q to quit${tick % 2 ? '' : ' '}`,
+    footer,
   ].join('\n');
 }
 
 export function runTop(outputEl, onQuit) {
+  const narrow = matchMedia('(max-width: 600px)').matches;
   const panel = document.createElement('pre');
   panel.id = 'top-panel';
   panel.setAttribute('aria-hidden', 'true');
@@ -43,14 +66,14 @@ export function runTop(outputEl, onQuit) {
   cmd.blur();
 
   let tick = 0;
-  const draw = () => { panel.innerHTML = frame(tick); tick += 1; };
+  const draw = () => { panel.innerHTML = frame(tick, narrow); tick += 1; };
   draw();
   const timer = reduced ? null : setInterval(draw, 1000);
 
   function quit() {
     if (timer) clearInterval(timer);
     document.removeEventListener('keydown', onKey, true);
-    panel.removeEventListener('click', quit);
+    document.removeEventListener('click', quit, true);
     panel.remove();
     onQuit();
   }
@@ -64,5 +87,5 @@ export function runTop(outputEl, onQuit) {
   }
 
   document.addEventListener('keydown', onKey, true);
-  panel.addEventListener('click', quit);
+  document.addEventListener('click', quit, true);
 }
