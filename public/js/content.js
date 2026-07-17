@@ -19,8 +19,9 @@ export const content = {
     out('  whoami      Who is this'),
     out('  projects    What I am building'),
     out('  history     The timeline'),
-    out('  neofetch    The flex'),
+    out('  neofetch    System info, loosely defined'),
     out('  top         See what is running'),
+    out('  colophon    How this was made'),
     out('  contact     Say hello'),
     out('  clear       Tidy up'),
     out('  exit        Leave (not vim, you can)'),
@@ -115,6 +116,13 @@ export const content = {
     out('Shell: /bin/lawyer (in background)'),
     out('Packages: C++, Python, TS, claude-sdk'),
     dim('Theme: amber on void'),
+  ],
+
+  colophon: [
+    out('wil-scott.com. Vanilla JS, no framework, no build step.'),
+    out('Hosted on Cloudflare. Type is JetBrains Mono.'),
+    out('Built with agents. Argued with daily.'),
+    { text: 'Source: github.com/wil-scott/wil-scott.com', style: 'out', href: 'https://github.com/wil-scott/wil-scott.com' },
   ],
 
   jokes: {

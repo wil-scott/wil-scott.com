@@ -29,7 +29,7 @@ test('projects have honest statuses', () => {
 
 test('help mentions every core command', () => {
   const helpText = content.help.map(l => l.text).join(' ');
-  for (const cmd of ['whoami', 'projects', 'history', 'neofetch', 'top', 'contact', 'clear', 'exit']) {
+  for (const cmd of ['whoami', 'projects', 'history', 'neofetch', 'top', 'colophon', 'contact', 'clear', 'exit']) {
     assert.ok(helpText.includes(cmd), `help missing ${cmd}`);
   }
 });

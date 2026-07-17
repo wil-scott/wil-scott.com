@@ -10,6 +10,7 @@ const commands = {
   pwd: () => ({ lines: content.jokes.pwd, effect: null }),
   history: () => ({ lines: content.history, effect: null }),
   neofetch: () => ({ lines: content.neofetch, effect: null }),
+  colophon: () => ({ lines: content.colophon, effect: null }),
   vim: () => ({ lines: content.jokes.vim, effect: null }),
   clear: () => ({ lines: [], effect: 'clear' }),
   exit: () => ({ lines: [], effect: 'exit' }),

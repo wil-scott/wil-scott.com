@@ -77,6 +77,10 @@ test('easter eggs route correctly', () => {
   assert.deepEqual(route('neofetch').lines, content.neofetch);
 });
 
+test('colophon returns the colophon lines', () => {
+  assert.deepEqual(route('colophon').lines, content.colophon);
+});
+
 test('complete fills a unique command prefix', () => {
   assert.deepEqual(complete('who'), ['whoami']);
   assert.deepEqual(complete('nef'), []);
