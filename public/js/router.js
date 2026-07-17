@@ -5,7 +5,6 @@ import { content } from './content.js';
 const commands = {
   help: () => ({ lines: content.help, effect: null }),
   whoami: () => ({ lines: content.whoami, effect: null }),
-  resume: () => ({ lines: content.resume, effect: null }),
   contact: () => ({ lines: content.contact, effect: null }),
   ls: () => ({ lines: content.lsListing, effect: null }),
   pwd: () => ({ lines: content.jokes.pwd, effect: null }),

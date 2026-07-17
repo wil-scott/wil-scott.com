@@ -23,15 +23,6 @@ function toast(text) {
   toast.timer = setTimeout(() => { t.hidden = true; }, 6000);
 }
 
-async function resumeIconAction() {
-  // honest degradation: only offer the pdf if it actually exists
-  try {
-    const head = await fetch('/resume.pdf', { method: 'HEAD' });
-    if (head.ok) { window.location.href = '/resume.pdf'; return; }
-  } catch { /* fall through to the honest line */ }
-  toast(content.desktop.resume.fallbackLine);
-}
-
 function initTheme() {
   const btn = $('btn-theme');
   const apply = (t) => {
@@ -88,7 +79,6 @@ export function initUI() {
   $('dock').addEventListener('click', () => { $('dock').hidden = true; restore(); });
   $('reconnect').addEventListener('click', restore);
 
-  $('icon-resume').addEventListener('click', resumeIconAction);
   $('icon-daedalus').addEventListener('click', () => toast(content.desktop.daedalus.line));
   $('icon-trash').addEventListener('click', () => toast(content.desktop.trash.line));
 }
