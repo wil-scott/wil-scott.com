@@ -37,7 +37,7 @@ export function initTerminal() {
       const path = document.createElement('span');
       path.className = 'prompt-path';
       path.textContent = promptPathText;
-      div.append(user, path, document.createTextNode(` ${line.text}`));
+      div.append(user, path, document.createTextNode(line.text));
       return div;
     }
 

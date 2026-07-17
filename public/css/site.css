@@ -90,7 +90,7 @@ body.maxed #plain-link, body.min #plain-link, body.closed #plain-link { display:
 .prompt-path { color: var(--dim); margin-right: 8px; }
 #echo { color: var(--fg); font-weight: 700; white-space: pre; }
 #cursor { display: inline-block; width: 8px; height: 17px; background: var(--accent); vertical-align: text-bottom; animation: blink 1.1s step-end infinite; }
-#cmd { position: absolute; opacity: 0; width: 1px; height: 1px; }
+#cmd { position: absolute; opacity: 0; width: 1px; height: 1px; font-size: 16px; }
 #window:focus-within #titlebar { box-shadow: inset 0 -1px 0 var(--accent); }
 @keyframes blink { 50% { opacity: 0; } }
 

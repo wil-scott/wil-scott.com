@@ -53,22 +53,20 @@ export function typeLines(lines, print, charDelay = 25) {
   return lines.reduce((chain, line) => chain.then(() => new Promise((done) => {
     let i = 0;
     // terminal.js's renderLine builds a 'cmd' (non-href) line as
-    // [span.prompt-user][span.prompt-path][text node " <text>"], so the
-    // animated text there lives in a trailing text node with a leading
-    // space, not the whole element. href lines hold their text in a
-    // single <a> child. plain lines use `div.textContent = ...`, which
-    // for our empty partial inserts NO child node at all, so lastChild
-    // is null there; type into the line div itself in that case (safe:
-    // no sibling spans to destroy, and the end state equals print()'s).
-    const isCmdEcho = line.style === 'cmd' && !line.href;
-    const prefix = isCmdEcho ? ' ' : '';
+    // [span.prompt-user][span.prompt-path][text node "<text>"], so the
+    // animated text there lives in a trailing text node, not the whole
+    // element. href lines hold their text in a single <a> child. plain
+    // lines use `div.textContent = ...`, which for our empty partial
+    // inserts NO child node at all, so lastChild is null there; type
+    // into the line div itself in that case (safe: no sibling spans to
+    // destroy, and the end state equals print()'s).
     const partial = { ...line, text: '' };
     print([partial]);
     const el = $('output').lastElementChild;
     const target = el.lastChild ?? el;
     const tick = setInterval(() => {
       i += 1;
-      target.textContent = prefix + line.text.slice(0, i);
+      target.textContent = line.text.slice(0, i);
       if (i >= line.text.length) { clearInterval(tick); done(); }
     }, charDelay);
   })), Promise.resolve());
