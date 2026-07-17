@@ -1,6 +1,6 @@
 // public/js/top.js
 const PROCS = [
-  { pid: 1, name: 'career_pivot', base: 82, time: '11y+' },
+  { pid: 1, name: 'career_pivot', base: 82, time: '5y' },
   { pid: 137, name: 'triage_agent', base: 34, time: '2:41' },
   { pid: 2014, name: 'law_degree', base: 2, time: '7y', state: 'sleeping' },
   { pid: 404, name: 'imposter_syndrome', base: 0, time: '?:??', state: 'zombie' },
