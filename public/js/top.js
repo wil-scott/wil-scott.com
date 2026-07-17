@@ -124,7 +124,7 @@ function loadAvgLine(base) {
   return base.map((n) => jitterFloat(n).toFixed(2)).join(', ');
 }
 
-function frame(state, narrow) {
+function frame(state, narrow, footer) {
   const barWidth = 12;
   const histLen = narrow ? HIST_NARROW : HIST_WIDE;
 
@@ -164,7 +164,6 @@ function frame(state, narrow) {
   const header = narrow
     ? 'w@vancouver   uptime: 3 careers'
     : `w@vancouver   load avg: ${loadAvgLine(state.loadBase)}   uptime: 3 careers`;
-  const footer = 'q or tap to quit';
 
   if (narrow) {
     const agentLines = AGENTS.map((a) => `  <span class="top-dot">●</span> ${a.name.padEnd(12)} ${a.status}`).join('\n');
@@ -233,8 +232,25 @@ function frame(state, narrow) {
   ].join('\n');
 }
 
+// Grows or shrinks a rolling history array to a new target length so the
+// sparkline is fully populated immediately after a layout flip, instead of
+// slowly refilling one draw tick at a time.
+function resizeHistory(hist, newLen, base) {
+  if (hist.length > newLen) {
+    hist.splice(0, hist.length - newLen);
+  } else if (hist.length < newLen) {
+    const pad = [];
+    for (let i = hist.length; i < newLen; i += 1) pad.push(jitter(base));
+    hist.unshift(...pad);
+  }
+}
+
 export function runTop(outputEl, onQuit) {
-  const narrow = matchMedia('(max-width: 600px)').matches;
+  const narrowQuery = matchMedia('(max-width: 600px)');
+  let narrow = narrowQuery.matches;
+  // pointer-aware footer wording, evaluated once: a device's coarse/fine
+  // pointer capability doesn't change mid-session the way viewport width does.
+  const footer = matchMedia('(pointer: coarse)').matches ? 'q or tap to quit' : 'q or click to quit';
   const panel = document.createElement('pre');
   panel.id = 'top-panel';
   panel.setAttribute('aria-hidden', 'true');
@@ -261,14 +277,25 @@ export function runTop(outputEl, onQuit) {
 
   // innerHTML is safe here: all rendered content is static or generated
   // in-module (no user input, no untrusted strings).
-  const draw = () => { panel.innerHTML = frame(state, narrow); };
+  const draw = () => { panel.innerHTML = frame(state, narrow, footer); };
   draw();
   const timer = reduced ? null : setInterval(draw, 1000);
+
+  function onLayoutChange(e) {
+    narrow = e.matches;
+    const newHistLen = narrow ? HIST_NARROW : HIST_WIDE;
+    resizeHistory(state.cpuHistory, newHistLen, state.lastCpu);
+    resizeHistory(state.memHistory, newHistLen, state.lastMem);
+    draw();
+  }
+
+  narrowQuery.addEventListener('change', onLayoutChange);
 
   function quit() {
     if (timer) clearInterval(timer);
     document.removeEventListener('keydown', onKey, true);
     document.removeEventListener('click', onClick, true);
+    narrowQuery.removeEventListener('change', onLayoutChange);
     panel.remove();
     onQuit();
   }
