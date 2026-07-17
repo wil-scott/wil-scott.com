@@ -137,6 +137,7 @@ body.closed #closed { display: flex; }
 #top-panel { white-space: pre; color: var(--out); }
 #top-panel .bar-fill { color: var(--accent); }
 #top-panel .bar-empty { color: var(--dim); }
+#top-panel .top-dot { color: #3DDBB4; }
 
 /* ---- focus + motion + mobile ---- */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

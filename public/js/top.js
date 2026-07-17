@@ -7,37 +7,97 @@ const PROCS = [
   { pid: 8787, name: 'wil-scott.com', base: 12, time: '0:01' },
 ];
 
-const jitter = (n) => Math.max(0, Math.min(99, n + Math.round((Math.random() - 0.5) * 14)));
+const AGENTS = [
+  { name: 'talos', status: 'building' },
+];
 
-function bar(pct, width = 30) {
+const SPARK = '▁▂▃▄▅▆▇█';
+const HIST_WIDE = 30;
+const HIST_NARROW = 16;
+
+const jitter = (n) => Math.max(0, Math.min(99, n + Math.round((Math.random() - 0.5) * 14)));
+const jitterFloat = (n) => Math.max(0, n + (Math.random() - 0.5) * 0.4);
+
+function bar(pct, width) {
   const fill = Math.round((pct / 100) * width);
   return `<span class="bar-fill">${'█'.repeat(fill)}</span><span class="bar-empty">${'░'.repeat(width - fill)}</span>`;
 }
 
-function frame(tick, narrow) {
+function sparkChar(pct) {
+  const idx = Math.max(0, Math.min(SPARK.length - 1, Math.floor((pct / 100) * SPARK.length)));
+  return SPARK[idx];
+}
+
+function seedHistory(len, base) {
+  const h = [];
+  for (let i = 0; i < len; i += 1) h.push(jitter(base));
+  return h;
+}
+
+function pushHistory(hist, val, len) {
+  hist.push(val);
+  while (hist.length > len) hist.shift();
+}
+
+function sparkline(hist) {
+  return `<span class="bar-fill">${hist.map(sparkChar).join('')}</span>`;
+}
+
+function sortedProcs(cpuByPid) {
+  return [...PROCS].sort((a, b) => {
+    const aZombie = a.state === 'zombie';
+    const bZombie = b.state === 'zombie';
+    if (aZombie && !bZombie) return 1;
+    if (bZombie && !aZombie) return -1;
+    return cpuByPid.get(b.pid) - cpuByPid.get(a.pid);
+  });
+}
+
+function loadAvgLine(base) {
+  return base.map((n) => jitterFloat(n).toFixed(2)).join(', ');
+}
+
+function frame(state, narrow) {
+  const barWidth = narrow ? 12 : 30;
+  const histLen = narrow ? HIST_NARROW : HIST_WIDE;
+
   const cpu = jitter(68);
   const mem = jitter(41);
-  const barWidth = narrow ? 12 : 30;
-  const rows = PROCS.map((p) => {
-    const c = p.state === 'zombie' ? 0 : jitter(p.base);
-    const state = p.state || 'running';
+  pushHistory(state.cpuHistory, cpu, histLen);
+  pushHistory(state.memHistory, mem, histLen);
+
+  const cpuByPid = new Map(PROCS.map((p) => [p.pid, p.state === 'zombie' ? 0 : jitter(p.base)]));
+  const procs = sortedProcs(cpuByPid);
+
+  const rows = procs.map((p) => {
+    const c = cpuByPid.get(p.pid);
+    const state2 = p.state || 'running';
+    const dot = state2 === 'running' ? '<span class="top-dot">●</span>' : ' ';
     if (narrow) {
-      return `${String(p.pid).padStart(4)} ${p.name.padEnd(16)} ${String(c).padStart(3)}% ${state.padEnd(8)}`.trimEnd();
+      return `${dot} ${String(p.pid).padStart(4)} ${p.name.padEnd(16)} ${String(c).padStart(3)}% ${state2.padEnd(8)}`.trimEnd();
     }
-    return `${String(p.pid).padStart(5)}  ${p.name.padEnd(20)} ${String(c).padStart(3)}%  ${state.padEnd(9)} ${p.time}`;
+    return `${dot} ${String(p.pid).padStart(5)}  ${p.name.padEnd(20)} ${String(c).padStart(3)}%  ${state2.padEnd(9)} ${p.time}`;
   }).join('\n');
 
-  const footer = `q or tap to quit${tick % 2 ? '' : ' '}`;
+  const agentLines = AGENTS.map((a) => `  <span class="top-dot">●</span> ${a.name.padEnd(narrow ? 12 : 16)} ${a.status}`).join('\n');
+
+  const header = `w@vancouver   load avg: ${loadAvgLine(state.loadBase)}   uptime: 3 careers`;
+  const footer = 'q or tap to quit';
 
   if (narrow) {
-    const header = `${'pid'.padStart(4)} ${'name'.padEnd(16)} ${'cpu'.padStart(3)}% ${'state'.padEnd(8)}`.trimEnd();
+    const procHeader = `  ${'pid'.padStart(4)} ${'name'.padEnd(16)} ${'cpu'.padStart(3)}% ${'state'.padEnd(8)}`.trimEnd();
     return [
-      `cpu  [${bar(cpu, barWidth)}] ${String(cpu).padStart(3)}%`,
-      'uptime: 3 careers',
-      `mem  [${bar(mem, barWidth)}] ${String(mem).padStart(3)}%`,
-      'load: rising steadily',
-      '',
       header,
+      '',
+      `cpu  [${bar(cpu, barWidth)}] ${String(cpu).padStart(3)}%`,
+      `     ${sparkline(state.cpuHistory)}`,
+      `mem  [${bar(mem, barWidth)}] ${String(mem).padStart(3)}%`,
+      `     ${sparkline(state.memHistory)}`,
+      '',
+      'agents',
+      agentLines,
+      '',
+      procHeader,
       rows,
       '',
       footer,
@@ -45,10 +105,15 @@ function frame(tick, narrow) {
   }
 
   return [
-    `cpu  [${bar(cpu, barWidth)}] ${String(cpu).padStart(3)}%   uptime: 3 careers`,
-    `mem  [${bar(mem, barWidth)}] ${String(mem).padStart(3)}%   load: rising steadily`,
+    header,
     '',
-    '  pid  name                 cpu   state     time',
+    `cpu  [${bar(cpu, barWidth)}] ${String(cpu).padStart(3)}%   ${sparkline(state.cpuHistory)}`,
+    `mem  [${bar(mem, barWidth)}] ${String(mem).padStart(3)}%   ${sparkline(state.memHistory)}`,
+    '',
+    'agents',
+    agentLines,
+    '',
+    '    pid  name                 cpu   state     time',
     rows,
     '',
     footer,
@@ -65,8 +130,16 @@ export function runTop(outputEl, onQuit) {
   const cmd = document.getElementById('cmd');
   cmd.blur();
 
-  let tick = 0;
-  const draw = () => { panel.innerHTML = frame(tick, narrow); tick += 1; };
+  const histLen = narrow ? HIST_NARROW : HIST_WIDE;
+  const state = {
+    cpuHistory: seedHistory(histLen, 68),
+    memHistory: seedHistory(histLen, 41),
+    loadBase: [0.92, 0.78, 0.63],
+  };
+
+  // innerHTML is safe here: all rendered content is static or generated
+  // in-module (no user input, no untrusted strings).
+  const draw = () => { panel.innerHTML = frame(state, narrow); };
   draw();
   const timer = reduced ? null : setInterval(draw, 1000);
 
