@@ -56,7 +56,8 @@ body.maxed { padding: 0; }
 body.maxed #window { max-width: none; max-height: none; height: 100vh; border: none; border-radius: 0; box-shadow: none; }
 body.maxed #titlebar { background: transparent; border-bottom: none; }
 body.min #window, body.closed #window { display: none; }
-body.maxed #plain-link, body.min #plain-link, body.closed #plain-link { display: none; }
+body.maxed #plain-link, body.min #plain-link, body.closed #plain-link,
+body.maxed #contact-line, body.min #contact-line, body.closed #contact-line { display: none; }
 
 #titlebar { background: var(--bar); border-bottom: 1px solid var(--border); padding: 8px 14px; display: flex; align-items: center; }
 .dot { width: 12px; height: 12px; border-radius: 50%; border: none; margin-right: 8px; cursor: pointer; position: relative; padding: 0; }
@@ -144,7 +145,10 @@ body.closed #closed { display: flex; }
 #closed > * { pointer-events: auto; }
 #reconnect { background: none; border: none; color: var(--accent); font-family: inherit; font-size: 14px; cursor: pointer; text-decoration: underline; margin-top: 8px; }
 
-#plain-link { margin-top: 14px; color: var(--dim); font-size: 12px; }
+#contact-line { margin-top: 14px; color: var(--dim); font-size: 12px; }
+#contact-line a { color: var(--dim); text-decoration: none; }
+#contact-line a:hover, #contact-line a:focus-visible { color: var(--accent); text-decoration: underline; }
+#plain-link { margin-top: 4px; color: var(--dim); font-size: 12px; }
 .noscript-note { color: var(--out); margin-top: 16px; }
 
 /* ---- top program ---- */
@@ -181,5 +185,6 @@ body.closed #closed { display: flex; }
   body { padding: 0; }
   #window { max-width: none; max-height: none; height: 100dvh; border: none; border-radius: 0; }
   #plain-link { position: fixed; bottom: 6px; left: 0; right: 0; text-align: center; }
+  #contact-line { position: fixed; bottom: 24px; left: 0; right: 0; text-align: center; }
   .icon { right: 16px; }
 }
